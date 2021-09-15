@@ -34,4 +34,14 @@ const UsuarioSchema = new Schema({
 
 })
 
+
+//Modificacion del metodo json que se encuentra en el esquema 
+//para quitar el password y version
+//Solo lo elimina al intentar hacer la peticion a la ruta, en nuestro db se mantiene
+UsuarioSchema.methods.toJSON = function () {
+    const {__v, password, ...usuario} = this.toObject();
+    
+    return usuario
+}
+
 module.exports = model('Usuario', UsuarioSchema);

@@ -2,12 +2,21 @@ const {request ,response} = require('express');
 const Usuario = require('../models/usuario')
 const bcryptJs = require('bcryptjs');
 
-const usuariosGet = (req = request, res = response)=> {
+const usuariosGet = async(req = request, res = response)=> {
     const querys = req.query
+    const {limit = 5, desde = 0, estado = true } = querys
+
+
+    const [usuarios, total] = await Promise.all([
+        Usuario.find({estado})
+            .skip(Number(desde))
+            .limit(Number(limit)),
+        Usuario.countDocuments({estado}),
+    ]) 
 
     res.json({
-        ok: true,
-        message: 'Get API controller'
+        total,
+        usuarios
     })
 
 }
@@ -15,16 +24,10 @@ const usuariosGet = (req = request, res = response)=> {
 const usuariosPost = async (req = request, res = response)=> {
 
 
-    const {name, correo, password, rol} = req.body;
-    const usuario = new Usuario({name, correo, password, rol});
+    const {name, correo, password, rol, google} = req.body;
+    const usuario = new Usuario({name, correo, password, rol, google});
     
-    //verificar si el correo existe
-    const existeEmail = await Usuario.findOne({correo});
-    if(existeEmail){
-        return res.status(400).json({
-            msg: 'El correo ya esta registrado'
-        })
-    }
+    
 
     //encryptar contraseña
     const salt = bcryptJs.genSaltSync();
@@ -36,28 +39,47 @@ const usuariosPost = async (req = request, res = response)=> {
     console.log('usuario creado')
     res.json({
         ok: true,
-        message: 'Post API controller',
+        message: 'Usuario registrado exitosamente',
         usuario
     })
 
 }
 
-const usuariosDelete = (req = request, res = response)=> {
+const usuariosDelete = async(req = request, res = response)=> {
+
+    const {id} = req.params;
+
+    //No se deben eliminar documentos de nuestra db
+    //Es mejor crear un estado y cambiarlo de activo a inactivo
+
+
+    const usuario = await Usuario.findByIdAndUpdate(id, {estado : false});
 
     res.json({
         ok: true,
-        message: 'Delete API controller'
+        message: 'user deleted',
+        usuario
     })
 
 }
 
-const usuariosPut = (req = request, res = response)=> {
+const usuariosPut = async(req = request, res = response)=> {
 
-    const idUser = req.params.id;
+    const {id} = req.params;
+    const {correo, password, google, ...rest} = req.body;
+
+    if(password){
+        //encryptar contraseña
+        const salt = bcryptJs.genSaltSync();
+        rest.password = bcryptJs.hashSync(password, salt);
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate(id, rest)
 
     res.json({
         ok: true,
-        message: 'Put API controller'
+        message: 'Datos del usuario actualizado',
+        usuario
     })
 
 }
