@@ -11,6 +11,7 @@ class Server {
 
         this.port = process.env.PORT;
         this.usuariosPath = '/api/usuarios';
+        this.usuariosAuth = '/api/auth';
 
         //Conectar a la base de datos mongoose
         this.conectarDB();
@@ -41,6 +42,7 @@ class Server {
 
     routes(){
 
+        this.app.use(this.usuariosAuth, require('../routes/auth.routes.js'))
         this.app.use(this.usuariosPath, require('../routes/usuarios.routes.js'))
 
     }

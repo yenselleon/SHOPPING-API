@@ -48,17 +48,18 @@ const usuariosPost = async (req = request, res = response)=> {
 const usuariosDelete = async(req = request, res = response)=> {
 
     const {id} = req.params;
-
+    const uid = req.uid
     //No se deben eliminar documentos de nuestra db
     //Es mejor crear un estado y cambiarlo de activo a inactivo
-
+    const usuarioAutenticado = req.usuario;
 
     const usuario = await Usuario.findByIdAndUpdate(id, {estado : false});
 
     res.json({
         ok: true,
         message: 'user deleted',
-        usuario
+        usuario,
+        usuarioAutenticado
     })
 
 }

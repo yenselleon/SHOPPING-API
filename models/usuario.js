@@ -21,6 +21,7 @@ const UsuarioSchema = new Schema({
     rol: {
         type: String,
         required: true,
+        default: 'USER_ROLE',
         enum: ['ADMIN_ROLE', 'USER_ROLE']
     },
     estado:{
@@ -39,7 +40,8 @@ const UsuarioSchema = new Schema({
 //para quitar el password y version
 //Solo lo elimina al intentar hacer la peticion a la ruta, en nuestro db se mantiene
 UsuarioSchema.methods.toJSON = function () {
-    const {__v, password, ...usuario} = this.toObject();
+    const {__v, password, _id, ...usuario} = this.toObject();
+    usuario.uid = _id;
     
     return usuario
 }
