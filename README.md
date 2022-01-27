@@ -1,6 +1,6 @@
 # SHOPPING-API
 
-Ejecutar en la consola desde el directorio en donde se encuentra el proyecto el comando
+Ejecutar en la consola desde el directorio en donde se encuentra el proyecto, el comando
 ```
 npm install
 ```
